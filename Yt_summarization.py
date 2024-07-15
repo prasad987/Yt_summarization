@@ -18,7 +18,7 @@ use_gpu = torch.cuda.is_available()
 def download_video(url):
     ydl_opts = {
         'format': 'bestaudio/best',
-        'outtmpl': '/path/to/download/%(title)s.%(ext)s',
+        'outtmpl': '/contect/%(title)s.%(ext)s',
     }
     with YoutubeDL(ydl_opts) as ydl:
         result = ydl.extract_info(url, download=True)
@@ -63,15 +63,33 @@ def main():
             st.success('Video downloaded!')
 
         with st.spinner('Initializing model...'):
-            model_path = "path/to/your/model"
+            model_path = "/content/gdrive/MyDrive/llama-2-7b-32k-instruct.Q4_K_S.gguf"
             model = initialize_model(model_path)
             prompt_node = initialize_prompt_node(model)
             st.success('Model initialized!')
 
+        # Transcribe audio
         with st.spinner('Transcribing and summarizing audio...'):
             summary = transcribe_audio(video_file, prompt_node)
             st.success('Transcription and summarization complete!')
+
+        end_time = time.time()  # End the timer
+        elapsed_time = end_time - start_time
+
+        # Display layout with 2 columns
+        col1, col2 = st.columns([1,1])
+
+        # Column 1: Video view
+        with col1:
+            st.video(youtube_url)
+
+        # Column 2: Summary View
+        with col2:
+            
+            st.header("Summarization of YouTube Video")
             st.write(summary)
+            st.success(output["results"][0].split("\n\n[INST]")[0])
+            st.write(f"Time taken: {elapsed_time:.2f} seconds")
 
 if __name__ == "__main__":
     main()
