@@ -1,50 +1,32 @@
 import streamlit as st
-from yt_dlp import YoutubeDL
+from yt_dlp import YoutubeDL  # Import youtube_dl
 from haystack.nodes import PromptNode, PromptModel
 from haystack.nodes.audio import WhisperTranscriber
 from haystack.pipelines import Pipeline
 from model_add import LlamaCPPInvocationLayer
+import time
 import torch
-import os
-import requests
 
-st.set_page_config(layout="wide")
+st.set_page_config(
+    layout="wide"
+)
 
 # Ensure that we are using GPU if available
 use_gpu = torch.cuda.is_available()
 
-# URL to download the model from
-model_url = "https://huggingface.co/TheBloke/Llama-2-7B-32K-Instruct-GGUF/resolve/main/llama-2-7b-32k-instruct.Q4_K_S.gguf"
-
-# Path to save the downloaded model
-model_path = "/content/llama-2-7b-32k-instruct.Q4_K_S.gguf"
-
-# Function to download the model
-def download_model(url, path):
-    if not os.path.exists(path):
-        st.info(f"Downloading model from {url}...")
-        response = requests.get(url, stream=True)
-        with open(path, "wb") as file:
-            for chunk in response.iter_content(chunk_size=8192):
-                if chunk:
-                    file.write(chunk)
-        st.success("Model downloaded successfully!")
-    else:
-        st.info("Model already exists, skipping download.")
-
-# Function to download the video
+# Replace the download_video function to use youtube_dl
 def download_video(url):
     ydl_opts = {
         'format': 'bestaudio/best',
-        'outtmpl': '/content/%(title)s.%(ext)s',
+        'outtmpl': '/path/to/download/%(title)s.%(ext)s',
     }
     with YoutubeDL(ydl_opts) as ydl:
         result = ydl.extract_info(url, download=True)
         return ydl.prepare_filename(result)
 
-def initialize_model(model_path):
+def initialize_model(full_path):
     return PromptModel(
-        model_name_or_path=model_path,
+        model_name_or_path=full_path,
         invocation_layer_class=LlamaCPPInvocationLayer,
         use_gpu=use_gpu
     )
@@ -80,10 +62,8 @@ def main():
             video_file = download_video(url)
             st.success('Video downloaded!')
 
-        with st.spinner('Downloading model...'):
-            download_model(model_url, model_path)
-
         with st.spinner('Initializing model...'):
+            model_path = "path/to/your/model"
             model = initialize_model(model_path)
             prompt_node = initialize_prompt_node(model)
             st.success('Model initialized!')

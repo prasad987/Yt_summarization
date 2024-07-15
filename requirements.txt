@@ -1,7 +1,10 @@
+farm-haystack
 streamlit
-yt_dlp
 torch
-transformers
-sentence-transformers
-git+https://github.com/deepset-ai/haystack.git
-requests
+sentence_transformers
+yt_dlp
+faiss_cpu
+ctransformers
+git+https://github.com/openai/whisper.git 
+llama-cpp-python
+cached_property
