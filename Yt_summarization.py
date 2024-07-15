@@ -48,7 +48,7 @@ def main():
     st.title("YouTube Video Summarizer 🎥")
     st.markdown('<style>h1{color: orange; text-align: center;}</style>', unsafe_allow_html=True)
     st.subheader('Built with the Llama 2 🦙, Haystack, Streamlit and ❤️')
-    st.markdown('<style>h3{color: pink;  text-align: center;}</style>', unsafe_allow_html=True)
+    st.markdown('<style>h3{color: purple;  text-align: center;}</style>', unsafe_allow_html=True)
 
     # Expander for app details
     with st.expander("About the App"):
@@ -57,7 +57,8 @@ def main():
 
     # Input for YouTube URL
     url = st.text_input("Enter YouTube URL")
-    if st.button("Submit"):
+    if st.button("Submit") and url:
+        start_time = time.time()
         with st.spinner('Downloading video...'):
             video_file = download_video(url)
             st.success('Video downloaded!')
@@ -81,14 +82,14 @@ def main():
 
         # Column 1: Video view
         with col1:
-            st.video(youtube_url)
+            st.video(url)
 
         # Column 2: Summary View
         with col2:
             
             st.header("Summarization of YouTube Video")
             st.write(summary)
-            st.success(output["results"][0].split("\n\n[INST]")[0])
+            st.success(summary["results"][0].split("\n\n[INST]")[0])
             st.write(f"Time taken: {elapsed_time:.2f} seconds")
 
 if __name__ == "__main__":
